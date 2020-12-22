@@ -1,0 +1,38 @@
+{
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": {
+    "name": "Achraf Chaibi",
+    "url": "https://achraf-chaibi.tn/"
+  },
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "postinstall": "tsc",
+    "build": "rm -rf build && tsc -p .",
+    "deploy": "git add . && git commit -m Heroku && git push heroku master"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.10.0",
+    "@types/socket.io": "^2.1.12",
+    "@types/uuid": "^8.3.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.7.0",
+    "socket.io": "^3.0.4",
+    "typescript-rest": "^3.0.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/node": "^14.14.9",
+    "nodemon": "^2.0.4",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.6"
+  },
+  "engines": {
+    "node": "10.16.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "default",
+   "type": "postgres",
+   "host": "kandula.db.elephantsql.com",
+   "port": 5432,
+   "username": "cgyybwzs",
+   "password": "dFBlc9vj2RsMghe1LHhpnsig_66AzoQJ",
+   "database": "cgyybwzs",
+   "synchronize": false,
+   "logging": false,
+  "entities": [
+    "src/entity/*.js"
+  ],
+  "migrations": [
+    "src/migration/*.js"
+  ],
+   "cli": {
+      "entitiesDir": "src/entity",
+      "migrationsDir": "src/migration"
+   
+   }
+}
