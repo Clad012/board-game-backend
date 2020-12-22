@@ -6,8 +6,8 @@
     "url": "https://achraf-chaibi.tn/"
   },
   "scripts": {
-    "dev": "node dist/index.js",
-    "start": "nodemon src/index.ts",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
     "postinstall": "tsc",
     "build": "rm -rf build && tsc -p .",
     "deploy": "git add . && git commit -m Heroku && git push heroku master"
