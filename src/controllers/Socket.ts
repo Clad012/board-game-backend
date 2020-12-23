@@ -24,9 +24,9 @@ const connect = (server: any) => {
             if (room.length > 0) {
               console.log("ROOM IS FOUND");
               let varRoom = room[0];
-              socket.emit("game-found", varRoom._source.room_id);
+              socket.emit("game-found", varRoom._source.room_id, varRoom._id);
               //UPDATEROOM DISABLE ROOM
-              updateRoom({ doc: { is_active: false } }, varRoom._id);
+              //   updateRoom({ doc: { is_active: false } }, varRoom._id);
             } else {
               console.log("ROOM IS NOT FOUND... Creating new Room...");
               const newRoomID = getRandomRoom();
@@ -37,13 +37,13 @@ const connect = (server: any) => {
                 date: new Date(),
                 is_active: true,
               }).then((room: any) => {
-                socket.emit("game-found", newRoomID);
+                socket.emit("game-found", newRoomID, "none");
                 console.log("room created");
               });
             }
           });
         else {
-          socket.emit("game-found", roomID);
+          socket.emit("game-found", roomID, "none");
           if (!numClients[roomID])
             addRoom({
               room_id: roomID,
@@ -58,55 +58,74 @@ const connect = (server: any) => {
       }
     );
 
-    socket.on("join-room", (roomId: any, userId: string) => {
-      console.log(numClients);
-      if (numClients[roomId] == undefined) {
-        numClients[roomId] = 1;
-      } else {
-        numClients[roomId]++;
-      }
-      if (numClients[roomId] < 3) {
-        socket.join(roomId);
-        socket.to(roomId).broadcast.emit("player-connected", userId);
-      }
-      socket.on(
-        "game-ready",
-        (user: any, playerType: any, nbOfPlayers: any) => {
+    socket.on(
+      "join-room",
+      (roomId: any, userId: string, elasticRoomID: string) => {
+        console.log(numClients);
+        if (numClients[roomId] == undefined) {
+          numClients[roomId] = 1;
+        } else {
+          numClients[roomId]++;
+        }
+        if (numClients[roomId] < 3) {
+          socket.join(roomId);
+          socket.to(roomId).broadcast.emit("player-connected", userId);
+        }
+        socket.on(
+          "game-ready",
+          (user: any, playerType: any, nbOfPlayers: any) => {
+            socket
+              .to(roomId)
+              .broadcast.emit("game-ready", user, playerType, nbOfPlayers);
+          }
+        );
+        socket.on("lock-room", () => {
+          updateRoom(
+            { doc: { is_active: false } },
+            elasticRoomID
+          ).catch((err: any) => {});
+        });
+
+        socket.on(
+          "turn-end",
+          (nextTornadoCoordinates: any, tornadoDeciser: any) => {
+            console.log("turn");
+            socket
+              .to(roomId)
+              .broadcast.emit(
+                "turn-end",
+                nextTornadoCoordinates,
+                tornadoDeciser
+              );
+          }
+        );
+
+        socket.on("game-ended", (player: any) => {
+          socket.to(roomId).broadcast.emit("game-ended", player);
+        });
+
+        socket.on("action-done", (grid: any, playerX: any, playerY: any) => {
+          console.log("action done");
           socket
             .to(roomId)
-            .broadcast.emit("game-ready", user, playerType, nbOfPlayers);
-        }
-      );
+            .broadcast.emit("action-done", grid, playerX, playerY);
+        });
 
-      socket.on(
-        "turn-end",
-        (nextTornadoCoordinates: any, tornadoDeciser: any) => {
-          console.log("turn");
-          socket
-            .to(roomId)
-            .broadcast.emit("turn-end", nextTornadoCoordinates, tornadoDeciser);
-        }
-      );
+        socket.on("send-message", (message: any) => {
+          console.log("Message Sent");
+          socket.to(roomId).broadcast.emit("receive-message", message);
+        });
 
-      socket.on("action-done", (grid: any, playerX: any, playerY: any) => {
-        console.log("action done");
-        socket.to(roomId).broadcast.emit("action-done", grid, playerX, playerY);
-      });
-
-      socket.on("send-message", (message: any) => {
-        console.log("Message Sent");
-        socket.to(roomId).broadcast.emit("receive-message", message);
-      });
-
-      socket.on("leave-room", () => {
-        socket.to(roomId).broadcast.emit("player-disconnected", userId);
-        if (numClients[roomId]) numClients[roomId]--;
-      });
-      socket.on("disconnect", () => {
-        socket.to(roomId).broadcast.emit("player-disconnected", userId);
-        if (numClients[roomId]) numClients[roomId]--;
-      });
-    });
+        socket.on("leave-room", () => {
+          socket.to(roomId).broadcast.emit("player-disconnected", userId);
+          if (numClients[roomId]) numClients[roomId]--;
+        });
+        socket.on("disconnect", () => {
+          socket.to(roomId).broadcast.emit("player-disconnected", userId);
+          if (numClients[roomId]) numClients[roomId]--;
+        });
+      }
+    );
   });
 };
 

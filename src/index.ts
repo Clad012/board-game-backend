@@ -12,14 +12,14 @@ import connect from "./controllers/Socket";
 const NAMESPACE = "Server";
 const router = express();
 /** Log the request */
-router.use((req, res, next) => {
-  logging.info(
-    `METHOD: [${req.method}] - URL: [${req.url}] - STATUS: [${res.statusCode}] - IP: [${req.socket.remoteAddress}]`,
-    NAMESPACE
-  );
+// router.use((req, res, next) => {
+//   logging.info(
+//     `METHOD: [${req.method}] - URL: [${req.url}] - STATUS: [${res.statusCode}] - IP: [${req.socket.remoteAddress}]`,
+//     NAMESPACE
+//   );
 
-  next();
-});
+//   next();
+// });
 
 /** Parse the body of the request */
 router.use(bodyParser.urlencoded({ extended: true }));
