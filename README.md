@@ -1,3 +1,3 @@
 # About
 
-This is the backend for my recent project: ElegantStore: Node.js + Express.js API with TypeScript
+This is the backend for my recent project: BoardGame: Node.js + Express.js + Elasticsearch API with TypeScript
